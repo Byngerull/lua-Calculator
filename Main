@@ -1,0 +1,40 @@
+local function magic(str)
+			local tokens = {}
+			for token in string.gmatch(str, "%S+") do
+				table.insert(tokens, token)
+			end
+
+			while true do
+				local start, _end = string.find(str, '%b()')
+				if not start then break end
+
+				str = string.sub(str, 1, start - 1) .. magic(string.sub(str, start + 1, _end - 1)) .. string.sub(str, _end + 1)
+			end
+
+			tokens = {}
+			for token in string.gmatch(str, "%S+") do
+				table.insert(tokens, token)
+			end
+
+			for i=1, #tokens do
+				if tokens[i] == "*" or tokens[i] == "/" then
+					local op = tokens[i]
+					local result = operations[op](tonumber(tokens[i-1]), tonumber(tokens[i+1]))
+					tokens[i-1] = result
+					table.remove(tokens, i)
+					table.remove(tokens, i) 
+				else
+					i += 1 
+				end
+			end
+
+			local result = tonumber(tokens[1])
+			for i = 2, #tokens, 2 do
+				local op = tokens[i]
+				local nextNum = tonumber(tokens[i + 1])
+				result = operations[op](result, nextNum)
+			end
+
+			return result
+
+		end
